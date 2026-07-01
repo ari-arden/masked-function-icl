@@ -1,0 +1,9 @@
+*.png binary
+*.pdf binary
+*.jpg binary
+
+# Use Git LFS or GitHub Releases for trained weights.
+*.pt filter=lfs diff=lfs merge=lfs -text
+*.pth filter=lfs diff=lfs merge=lfs -text
+*.ckpt filter=lfs diff=lfs merge=lfs -text
+

@@ -1,0 +1,27 @@
+inherit:
+    - base.yaml
+
+model:
+    family: masked_pair_set_encoder
+    n_positions: 41
+    n_layer: 6
+
+training:
+    task: linear_regression
+    objective: variable_dense_leave_one_out
+    random_prefix_min_points: 2
+    loo_targets_per_sequence: 8
+    batch_size: 64
+    learning_rate: 0.0001
+    train_steps: 200000
+    curriculum:
+        points:
+            start: 11
+            end: 41
+            inc: 2
+            interval: 2000
+
+out_dir: ../runs/linear_masked_pair_set_variable_loo_l6_b64_lr1e4
+
+wandb:
+    name: "linear_masked_pair_set_variable_loo_l6_b64_lr1e4"

@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt -r requirements-dev.txt
+      - name: Compile key scripts
+        run: |
+          python -m py_compile scripts/train_synthetic_icl.py scripts/eval_checkpoint_curve.py scripts/eval_gpt2_linear_curve.py scripts/eval_noisy_linear_regression.py scripts/eval_decision_tree_baselines.py scripts/eval_relu_2nn_baselines.py scripts/aggregate_linear_regression.py scripts/assemble_decision_tree_curve.py scripts/assemble_relu_2nn_curve.py scripts/plot_linear_regression.py scripts/plot_noisy_linear_regression.py scripts/plot_decision_tree.py scripts/plot_relu_2nn.py scripts/plotting_style.py
+      - name: Lint
+        run: python -m ruff check .
+      - name: Unit tests
+        run: pytest
+      - name: Regenerate checked-in figures
+        run: |
+          python scripts/plot_linear_regression.py \
+            --curve_csv results/linear_regression/curves/linear_regression_icl.csv \
+            --out_dir results/linear_regression/figures
+          python scripts/plot_decision_tree.py \
+            --curve-csv results/decision_tree/curves/decision_tree_icl.csv \
+            --out-dir results/decision_tree/figures
+          python scripts/plot_noisy_linear_regression.py \
+            --curve-csv results/noisy_linear_regression/curves/noisy_linear_regression_icl.csv \
+            --out-dir results/noisy_linear_regression/figures
+          python scripts/plot_relu_2nn.py \
+            --curve-csv results/relu_2nn_regression/curves/relu_2nn_icl.csv \
+            --out-dir results/relu_2nn_regression/figures
